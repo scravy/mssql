@@ -40,7 +40,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>fully.qualified.MainClass</mainClass>
+							<mainClass>MSSQL</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

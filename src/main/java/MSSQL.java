@@ -229,7 +229,7 @@ public class MSSQL {
 
         final List<String> cmds = new ArrayList<>();
         for (int i = 0; i < args.length; i++) {
-            switch (cmds.get(i)) {
+            switch (args[i]) {
             case "-f":
             case "--file":
                 if (i + 1 < args.length) {
