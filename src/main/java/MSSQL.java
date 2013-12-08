@@ -210,7 +210,7 @@ public class MSSQL {
 			dumpTablesStructure(c, p);
 
 		} else if (regexDataDump.find()) {
-			final String what = regexDump.group(2);
+			final String what = regexDataDump.group(2);
 			final Pattern p = Pattern.compile(what);
 			dumpTablesData(c, p);
 
@@ -259,7 +259,7 @@ public class MSSQL {
 				out.flush();
 			}
 		} catch (final Exception exc) {
-			err.printf("# %s: %s",
+			err.printf("# %s: %s\n",
 					exc.getClass().getName(),
 					exc.getMessage());
 			err.flush();
