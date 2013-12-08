@@ -1,11 +1,14 @@
+package de.fu.mi.mssql;
 import java.io.BufferedReader;
 import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -34,10 +37,17 @@ public class MSSQL {
 	static final Pattern dump = Pattern
 			.compile("^ *DUMP +([^ ;]+) *;?$", Pattern.CASE_INSENSITIVE);
 	static final Pattern dataDump = Pattern
-			.compile("^ *(DATADUMP|DUMPDATA) +([^ ;]+) *;?$", Pattern.CASE_INSENSITIVE);
+			.compile("^ *(DATADUMP|DUMPDATA) +([^ ;]+) *;?$",
+					Pattern.CASE_INSENSITIVE);
 
 	static PrintStream out = System.out;
 	static PrintStream err = System.err;
+	static PrintStream log = new PrintStream(new OutputStream() {
+		@Override
+		public void write(int b) throws IOException {
+
+		}
+	});
 
 	static String hostname = "localhost";
 	static String hostport = "1433";
@@ -70,7 +80,7 @@ public class MSSQL {
 
 	// ugly hack
 	static Set<Class<?>> classes = new HashSet<>();
-	
+
 	static void dumpTablesData(final Connection c, final Pattern p)
 			throws SQLException {
 		try (final Statement s = c.createStatement()) {
@@ -104,7 +114,8 @@ public class MSSQL {
 			throws SQLException {
 		try (final Statement s = c.createStatement()) {
 			try (final ResultSet r =
-					s.executeQuery(String.format("SELECT TOP 100 * FROM [%s]", table))) {
+					s.executeQuery(String.format("SELECT TOP 100 * FROM [%s]",
+							table))) {
 
 				final ResultSetMetaData m = r.getMetaData();
 				final int n = m.getColumnCount();
@@ -298,12 +309,8 @@ public class MSSQL {
 		out.println();
 	}
 
-	public static void main(final String... args) throws SQLException,
-			IOException {
-
-		// Found at
-		// http://stackoverflow.com/questions/11497530/jdbc-jtds-sql-server-connection-closed-after-ssl-authentication
-		System.setProperty("jsse.enableCBCProtection", "false");
+	static List<String> readCommandLineArgs(String[] args)
+			throws FileNotFoundException, IOException {
 
 		boolean readPasswordFromCommandLine = false;
 
@@ -386,7 +393,7 @@ public class MSSQL {
 			case "-help":
 			case "--help":
 				showHelp();
-				return;
+				break;
 			default:
 				cmds.add(args[i]);
 			}
@@ -407,9 +414,43 @@ public class MSSQL {
 			} else {
 				err.println("Could not access the Terminal for reading a password (System.console() returned null).");
 				System.exit(1);
-				return;
 			}
 		}
+
+		return cmds;
+	}
+
+	static void mainLoop(List<String> cmds, BufferedReader in, Connection c)
+			throws SQLException, IOException {
+
+		if (cmds.size() > 0) {
+			for (final String cmd : cmds) {
+				exec(c, cmd);
+			}
+
+		} else {
+			for (;;) {
+				final String line = in.readLine();
+				if (line == null || line.toLowerCase().equals("quit")) {
+					break;
+				}
+				if (line.toLowerCase().equals("help")) {
+					showOnlineHelp();
+					continue;
+				}
+				exec(c, line);
+			}
+		}
+	}
+
+	public static void main(final String... args) throws SQLException,
+			IOException {
+
+		// Found at
+		// http://stackoverflow.com/questions/11497530/jdbc-jtds-sql-server-connection-closed-after-ssl-authentication
+		System.setProperty("jsse.enableCBCProtection", "false");
+
+		List<String> cmds = readCommandLineArgs(args);
 
 		try (final Connection c = DriverManager.getConnection(String.format(
 				jdbcUrl, hostname, hostport, database, username, password))) {
@@ -417,24 +458,8 @@ public class MSSQL {
 			final BufferedReader in =
 					new BufferedReader(new InputStreamReader(System.in));
 
-			if (cmds.size() > 0) {
-				for (final String cmd : cmds) {
-					exec(c, cmd);
-				}
-
-			} else {
-				for (;;) {
-					final String line = in.readLine();
-					if (line == null || line.toLowerCase().equals("quit")) {
-						break;
-					}
-					if (line.toLowerCase().equals("help")) {
-						showOnlineHelp();
-						continue;
-					}
-					exec(c, line);
-				}
-			}
+			mainLoop(cmds, in, c);
+			
 		} catch (final SQLException exc) {
 			err.printf("# %s: %s\n",
 					exc.getClass().getName(),

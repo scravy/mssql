@@ -40,7 +40,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>MSSQL</mainClass>
+							<mainClass>de.fu.mi.mssql.MSSQL</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
