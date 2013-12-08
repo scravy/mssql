@@ -16,9 +16,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -66,6 +68,9 @@ public class MSSQL {
 		return String.format("exec sp_columns [%s];", table);
 	}
 
+	// ugly hack
+	static Set<Class<?>> classes = new HashSet<>();
+	
 	static void dumpTablesData(final Connection c, final Pattern p)
 			throws SQLException {
 		try (final Statement s = c.createStatement()) {
@@ -86,9 +91,11 @@ public class MSSQL {
 					}
 				}
 
+				classes.clear();
 				for (String table : tables) {
 					dumpData(c, table);
 				}
+				out.printf("TYPES USED: " + classes.toString());
 			}
 		}
 	}
@@ -97,7 +104,7 @@ public class MSSQL {
 			throws SQLException {
 		try (final Statement s = c.createStatement()) {
 			try (final ResultSet r =
-					s.executeQuery(String.format("SELECT * FROM [%s]", table))) {
+					s.executeQuery(String.format("SELECT TOP 100 * FROM [%s]", table))) {
 
 				final ResultSetMetaData m = r.getMetaData();
 				final int n = m.getColumnCount();
@@ -106,7 +113,10 @@ public class MSSQL {
 				while (r.next()) {
 					j++;
 					for (int i = 1; i <= n; i++) {
-						r.getObject(i);
+						Object o = r.getObject(i);
+						if (!r.wasNull() && o != null) {
+							classes.add(o.getClass());
+						}
 					}
 				}
 				out.printf("DUMPED %s WITH %d ROWS\n", table, j);
