@@ -97,7 +97,7 @@ public class MSSQL {
 			throws SQLException {
 		try (final Statement s = c.createStatement()) {
 			try (final ResultSet r =
-					s.executeQuery(String.format("SELECT TOP * FROM [%s]", table))) {
+					s.executeQuery(String.format("SELECT * FROM [%s]", table))) {
 
 				final ResultSetMetaData m = r.getMetaData();
 				final int n = m.getColumnCount();
@@ -113,7 +113,6 @@ public class MSSQL {
 
 			} catch (SQLException exc) {
 				out.println("CAN NOT ACCESS " + table);
-				exc.printStackTrace(out);
 			}
 		}
 	}
