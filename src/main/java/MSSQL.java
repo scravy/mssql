@@ -97,7 +97,7 @@ public class MSSQL {
 			throws SQLException {
 		try (final Statement s = c.createStatement()) {
 			try (final ResultSet r =
-					s.executeQuery(String.format("SELECT TOP 0 * FROM [%s]"))) {
+					s.executeQuery(String.format("SELECT TOP 0 * FROM [%s]", table))) {
 
 				final ResultSetMetaData m = r.getMetaData();
 				final int n = m.getColumnCount();
