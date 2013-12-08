@@ -97,17 +97,19 @@ public class MSSQL {
 			throws SQLException {
 		try (final Statement s = c.createStatement()) {
 			try (final ResultSet r =
-					s.executeQuery(String.format("SELECT TOP 0 * FROM [%s]", table))) {
+					s.executeQuery(String.format("SELECT TOP * FROM [%s]", table))) {
 
 				final ResultSetMetaData m = r.getMetaData();
 				final int n = m.getColumnCount();
 
+				int j = 0;
 				while (r.next()) {
+					j++;
 					for (int i = 1; i <= n; i++) {
-
+						r.getObject(i);
 					}
 				}
-				out.println("DUMPED " + table);
+				out.printf("DUMPED %s WITH %d ROWS\n", table, j);
 
 			} catch (SQLException exc) {
 				out.println("CAN NOT ACCESS " + table);
