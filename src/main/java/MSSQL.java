@@ -28,11 +28,11 @@ public class MSSQL {
 
 	static final Map<String, String> queries = new HashMap<String, String>();
 	static final Pattern describe = Pattern
-			.compile(" *[dD][eE][sS][cC][rR][iI][bB][eE] +([^ ;]+) *;?");
+			.compile("^ *DESCRIBE +([^ ;]+) *;?$", Pattern.CASE_INSENSITIVE);
 	static final Pattern dump = Pattern
-			.compile(" *[dD][uU][mM][pP] +([^ ;]+) *;?");
+			.compile("^ *DUMP +([^ ;]+) *;?$", Pattern.CASE_INSENSITIVE);
 	static final Pattern dataDump = Pattern
-			.compile(" *[dD][aA][tT][aA][dD][uU][mM][pP] +([^ ;]+) *;?");
+			.compile("^ *(DATADUMP|DUMPDATA)+([^ ;]+) *;?$", Pattern.CASE_INSENSITIVE);
 
 	static PrintStream out = System.out;
 	static PrintStream err = System.err;
