@@ -110,8 +110,7 @@ public class MSSQL {
 				out.println("DUMPED " + table);
 
 			} catch (SQLException exc) {
-				err.println("CAN NOT ACCESS " + table);
-				exc.printStackTrace(System.err);
+				out.println("CAN NOT ACCESS " + table);
 			}
 		}
 	}
