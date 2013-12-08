@@ -113,6 +113,7 @@ public class MSSQL {
 
 			} catch (SQLException exc) {
 				out.println("CAN NOT ACCESS " + table);
+				exc.printStackTrace(out);
 			}
 		}
 	}
