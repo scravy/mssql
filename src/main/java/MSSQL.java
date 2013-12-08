@@ -32,7 +32,7 @@ public class MSSQL {
 	static final Pattern dump = Pattern
 			.compile("^ *DUMP +([^ ;]+) *;?$", Pattern.CASE_INSENSITIVE);
 	static final Pattern dataDump = Pattern
-			.compile("^ *(DATADUMP|DUMPDATA)+([^ ;]+) *;?$", Pattern.CASE_INSENSITIVE);
+			.compile("^ *(DATADUMP|DUMPDATA) +([^ ;]+) *;?$", Pattern.CASE_INSENSITIVE);
 
 	static PrintStream out = System.out;
 	static PrintStream err = System.err;
@@ -210,7 +210,7 @@ public class MSSQL {
 			dumpTablesStructure(c, p);
 
 		} else if (regexDataDump.find()) {
-			final String what = regexDump.group(1);
+			final String what = regexDump.group(2);
 			final Pattern p = Pattern.compile(what);
 			dumpTablesData(c, p);
 
@@ -284,7 +284,7 @@ public class MSSQL {
 	}
 
 	static void showOnlineHelp() {
-		System.out.println();
+		out.println();
 	}
 
 	public static void main(final String... args) throws SQLException,
