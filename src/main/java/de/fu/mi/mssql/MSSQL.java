@@ -452,8 +452,13 @@ public class MSSQL {
 
 		List<String> cmds = readCommandLineArgs(args);
 
+		err.print("Connecting...");
+		
 		try (final Connection c = DriverManager.getConnection(String.format(
 				jdbcUrl, hostname, hostport, database, username, password))) {
+			
+			err.print("\r");
+			err.println("Connected!");
 
 			final BufferedReader in =
 					new BufferedReader(new InputStreamReader(System.in));
@@ -461,7 +466,7 @@ public class MSSQL {
 			mainLoop(cmds, in, c);
 			
 		} catch (final SQLException exc) {
-			err.printf("# %s: %s\n",
+			err.printf("\r# %s: %s\n",
 					exc.getClass().getName(),
 					exc.getMessage());
 			err.flush();
