@@ -457,8 +457,7 @@ public class MSSQL {
 		try (final Connection c = DriverManager.getConnection(String.format(
 				jdbcUrl, hostname, hostport, database, username, password))) {
 			
-			err.print("\r");
-			err.println("Connected!");
+			err.println("\nSuccess!");
 
 			final BufferedReader in =
 					new BufferedReader(new InputStreamReader(System.in));
@@ -466,7 +465,7 @@ public class MSSQL {
 			mainLoop(cmds, in, c);
 			
 		} catch (final SQLException exc) {
-			err.printf("\r# %s: %s\n",
+			err.printf(" Fail!\n# %s: %s\n",
 					exc.getClass().getName(),
 					exc.getMessage());
 			err.flush();
