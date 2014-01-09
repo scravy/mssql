@@ -1,4 +1,5 @@
 package de.fu.mi.mssql;
+
 import java.io.BufferedReader;
 import java.io.Console;
 import java.io.File;
@@ -78,7 +79,6 @@ public class MSSQL {
 		return String.format("exec sp_columns [%s];", table);
 	}
 
-	// ugly hack
 	static Set<Class<?>> classes = new HashSet<>();
 
 	static void dumpTablesData(final Connection c, final Pattern p)
@@ -453,17 +453,17 @@ public class MSSQL {
 		List<String> cmds = readCommandLineArgs(args);
 
 		err.print("Connecting...");
-		
+
 		try (final Connection c = DriverManager.getConnection(String.format(
 				jdbcUrl, hostname, hostport, database, username, password))) {
-			
+
 			err.println("\nSuccess!");
 
 			final BufferedReader in =
 					new BufferedReader(new InputStreamReader(System.in));
 
 			mainLoop(cmds, in, c);
-			
+
 		} catch (final SQLException exc) {
 			err.printf(" Fail!\n# %s: %s\n",
 					exc.getClass().getName(),
