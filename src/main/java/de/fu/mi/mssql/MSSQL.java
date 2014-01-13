@@ -50,6 +50,8 @@ public class MSSQL {
 		}
 	});
 
+	static boolean cbcProtection = false;
+
 	static String hostname = "localhost";
 	static String hostport = "1433";
 	static String database = "";
@@ -290,7 +292,7 @@ public class MSSQL {
 
 	static void showHelp() {
 		System.out
-				.println("Usage: java -jar mssql.jar MSSQL [OPTIONS...] [COMMANDS...]\n\n"
+				.println("Usage: java -jar mssql.jar [OPTIONS...] [COMMANDS...]\n\n"
 						+ "-o --out       Name of the file to redirect output to.\n"
 						+ "-u --user      Username to connect with.\n"
 						+ "-p --password  Password to connect with. If none is given\n"
@@ -301,6 +303,7 @@ public class MSSQL {
 						+ "-d --database  The database to use on the remote machine.\n"
 						+ "-U --url       The JDBC url used to connect with the database.\n"
 						+ "               This will override all previously set credentials.\n"
+						+ "-c --cbc       Enable CBC Protection.\n"
 						+ "-f --file      Read configuration from the specified file.\n");
 		System.exit(0);
 	}
@@ -390,6 +393,10 @@ public class MSSQL {
 				outFile.createNewFile();
 				out = new PrintStream(new FileOutputStream(outFile));
 				break;
+			case "-c":
+			case "--cbc":
+				cbcProtection = true;
+				break;
 			case "-help":
 			case "--help":
 				showHelp();
@@ -446,18 +453,19 @@ public class MSSQL {
 	public static void main(final String... args) throws SQLException,
 			IOException {
 
+		List<String> cmds = readCommandLineArgs(args);
+
 		// Found at
 		// http://stackoverflow.com/questions/11497530/jdbc-jtds-sql-server-connection-closed-after-ssl-authentication
-		System.setProperty("jsse.enableCBCProtection", "false");
-
-		List<String> cmds = readCommandLineArgs(args);
+		System.setProperty("jsse.enableCBCProtection",
+				cbcProtection ? "true" : "false");
 
 		err.print("Connecting...");
 
 		try (final Connection c = DriverManager.getConnection(String.format(
 				jdbcUrl, hostname, hostport, database, username, password))) {
 
-			err.println("\nSuccess!");
+			err.println("\rConnection successfully established.");
 
 			final BufferedReader in =
 					new BufferedReader(new InputStreamReader(System.in));
