@@ -9,5 +9,5 @@
 .project
 .settings
 target
-evento.properties
 .DS_Store
+*.properties
