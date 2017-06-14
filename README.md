@@ -17,6 +17,14 @@ This is a Java Command Line client for accessing MSSQL Databases using the JTDS 
                    This will override all previously set credentials.
     -f --file      Read configuration from the specified file.
 
+Building
+--------
+
+```
+mvn assembly:assembly
+mv target/mssql-jar-with-dependencies.jar mssql.jar
+```
+
 Usage
 -----
 
